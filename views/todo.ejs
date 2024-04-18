@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Todo 앱</title>
+  </head>
+  <body>
+    <h1>Todo 목록</h1>
+
+    <ul>
+      <% for (const todo of todoList) { %> <input type="checkbox"
+      name="complete" id="complete" <%= todo.complete ? 'checked' : '' %> >
+      <input
+        tpye="text"
+        name="contents"
+        id="contents"
+        value="<%= todo.content %>"
+        readonly
+      />
+      <br />
+      <% } %>
+    </ul>
+
+    <input
+      type="text"
+      name="content"
+      id="content"
+      placeholder="새로운 할 일 추가"
+    />
+    <button type="button" id="addBtn">추가</button>
+
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script>
+      const addBtn = document.getElementById("addBtn");
+      addBtn.addEventListener("click", () => {
+        const content = document.getElementById("content").value;
+        axios
+          .post("/todo", { content: content })
+          .then((data) => {
+            axios.get("/todo").then((data) => {
+              console.log("axios get : ", data);
+            });
+          })
+          .catch((err) => {
+            console.log("AXIOS ERROR!");
+          });
+      });
+    </script>
+  </body>
+</html>
