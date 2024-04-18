@@ -18,6 +18,7 @@
         value="<%= todo.content %>"
         readonly
       />
+      <button onclick="deleteTodo('<%= todo.id %>')">삭제</button>
       <br />
       <% } %>
     </ul>
@@ -38,42 +39,62 @@
         axios
           .post("/todo", { content: content })
           .then((data) => {
-            axios.get("/todo").then((result) => {
-              const data = result.data;
-              console.log(data);
-              const elTodo = document.getElementById("todo-list");
-              elTodo.innerHTML = "";
-
-              for (todo of data) {
-                const listItem = document.createElement("li");
-                listItem.style = "list-style-type: none;";
-
-                const checkbox = document.createElement("input");
-                checkbox.type = "checkbox";
-                checkbox.id = `todo-${todo.id}`;
-                checkbox.checked = todo.completed;
-
-                const label = document.createElement("label");
-                label.for = `content-${todo.id}`;
-                label.textContent = todo.content;
-
-                const deleteButton = document.createElement("button");
-                deleteButton.textContent = "삭제";
-                deleteButton.onclick = () => {
-                  console.log("삭제");
-                };
-
-                listItem.appendChild(checkbox);
-                listItem.appendChild(label);
-                listItem.appendChild(deleteButton);
-                elTodo.appendChild(listItem);
-              }
-            });
+            getTodolist();
           })
           .catch((err) => {
             console.log("AXIOS ERROR!");
           });
       });
+
+      const getTodolist = () => {
+        axios.get("/todo").then((result) => {
+          const data = result.data;
+          const elTodo = document.getElementById("todo-list");
+          elTodo.innerHTML = "";
+
+          data.forEach((todo) => {
+            const listItem = document.createElement("li");
+            listItem.style = "list-style-type: none;";
+            const labelIndex = document.createElement("label");
+            labelIndex.textContent = todo.id;
+            const checkbox = document.createElement("input");
+            checkbox.type = "checkbox";
+            checkbox.id = `todo-${todo.id}`;
+            checkbox.checked = todo.completed;
+
+            const label = document.createElement("label");
+            label.for = `content-${todo.id}`;
+            label.textContent = todo.content;
+
+            const deleteButton = document.createElement("button");
+            deleteButton.textContent = "삭제";
+            deleteButton.onclick = () => {
+              deleteTodo(todo.id);
+            };
+
+            listItem.appendChild(labelIndex);
+
+            listItem.appendChild(checkbox);
+            listItem.appendChild(label);
+            listItem.appendChild(deleteButton);
+            elTodo.appendChild(listItem);
+          });
+        });
+      };
+
+      function deleteTodo(id) {
+        axios
+          .delete("/todo", { data: { id: id } })
+          .then(() => {
+            console.log(`DELETED! ${id}`);
+          })
+          .then(() => {
+            getTodolist();
+          })
+          .catch((err) => {
+            console.log("Delete Error!");
+          });
+      }
     </script>
   </body>
 </html>

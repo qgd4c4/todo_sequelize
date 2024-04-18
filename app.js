@@ -27,18 +27,24 @@ sequelize
 
 app.get("/todo", (req, res, next) => {
   Todo.findAll().then((todoList) => {
-    console.log(todoList);
     res.send(todoList);
   });
 });
+
 app.post("/todo", (req, res, next) => {
-  const totoList = Todo.create({ content: req.body.content });
-  res.end();
+  const totoList = Todo.create({ content: req.body.content }).then(() => {
+    res.end();
+  });
+});
+
+app.delete("/todo", (req, res, next) => {
+  Todo.destroy({ where: { id: req.body.id } }).then(() => {
+    res.end();
+  });
 });
 
 app.get("/", (req, res, next) => {
   Todo.findAll().then((todoList) => {
-    console.log(todoList);
     res.render("todo", { todoList: todoList });
   });
 });
